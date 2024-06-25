@@ -18,16 +18,16 @@ public class BookDAO {
 
         try{
             //Create SQL insert statement
-            String sql = "INSERT INTO Books (book_id, title, author, genre, published_date, isbn, copies_available) VALUES (?,?,?,?,?,?,?)";
+            String sql = "INSERT INTO Books (title, author, genre, published_date, isbn, copies_available) VALUES (?,?,?,?,?,?)";
             PreparedStatement statement = conn.prepareStatement(sql);
 
-            statement.setInt(1, book.getID());
-            statement.setString(2, book.get_title());
-            statement.setString(3, book.get_author());
-            statement.setString(4, book.get_genre());
-            statement.setDate(5, book.get_published_date());
-            statement.setString(6, book.get_isbn());
-            statement.setInt(7, book.get_copiesAvailable());
+            //statement.setInt(1, book.getID());
+            statement.setString(1, book.get_title());
+            statement.setString(2, book.get_author());
+            statement.setString(3, book.get_genre());
+            statement.setDate(4, book.get_published_date());
+            statement.setString(5, book.get_isbn());
+            statement.setInt(6, book.get_copiesAvailable());
 
 
             // Execute insert statement
@@ -115,14 +115,13 @@ public class BookDAO {
             // get the row 
             if (resultSet.next())
             {
-                int book_id = resultSet.getInt("book_id");
                 String title = resultSet.getString("title");
                 String author = resultSet.getString("author");
                 String genre = resultSet.getString("genre");
                 Date publishedDate = resultSet.getDate("published_date");
                 String isbn = resultSet.getString("isbn");
                 int copies_available = resultSet.getInt("copies_available");
-                return new Book(book_id, title, author, genre, publishedDate, isbn,copies_available);
+                return new Book(bookId, title, author, genre, publishedDate, isbn,copies_available);
             }
             else
             {

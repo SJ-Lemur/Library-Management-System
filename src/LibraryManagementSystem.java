@@ -6,11 +6,12 @@ import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 
+
 public class LibraryManagementSystem {
 
     public static void main(String[] args)
     {
-
+        Scanner scanner = new Scanner(System.in);
         LibraryManagementSystem libraryObj = new LibraryManagementSystem();
 
         BookService BookServiceObject  = new BookService();
@@ -18,68 +19,53 @@ public class LibraryManagementSystem {
 
         //Display some introductory text
         System.out.println("Welcome to the Library Management System!");
-        System.out.println("Please select option below if you're a member of the library or a librarian?:");
-
-        System.out.println("1. Member");
-        System.out.println("2. Librarian");
-        System.out.println("type --'quit'-- to exit the program");
+        System.out.println("Please enter your username and password  to access your account.");
         System.out.println();
-        System.out.print("Select your option: ");
-        Scanner scanner = new Scanner(System.in);
+  
+        System.out.print("Username: ");
+        String username = scanner.nextLine();
+
+        System.out.print("Password: ");
+        String password = scanner.nextLine();
+
         
-
-        //read the input provided by the user
-        String option = scanner.nextLine();
-        System.out.println();
-
-        if (option.equals("1"))
+        String logInCorrect = "login correct";
+        String option = "";
+        // CHECK IF LOGIN DETAILS ARE CORRECT
+        while (!option.equals(logInCorrect))
         {
-            // Members functions
-            while (!option.equalsIgnoreCase("quit"))
+            if (libraryObj.isLibrarianRegistered(username, password))
             {
-                //Display options
-                System.out.println("Select your option from the following:");
-                System.out.println("1. Books");
-                System.out.println("2. Borrow a Book");
-                System.out.print("Select your option: ");
-
-                option = scanner.nextLine();
-                System.out.println();
-
-                if (option.equals("1"))
-                {
-                    //BOOK FUNCTIONS
-                    libraryObj.manage_books(scanner, BookServiceObject, 1);
-
-                }
-                else if (option.equals("2"))
-                {
-                    // BORROW BOOK
-                    libraryObj.borrow_book(scanner, BookServiceObject);
-                }
-
-                System.out.println();
+                break;
             }
-            
+            else
+            { 
+                System.out.println();
+                System.out.println("Login details incorrect.");
+                System.out.println();
+                System.out.print("Username: ");
+                username = scanner.nextLine();
+
+                System.out.print("Password: ");
+                password = scanner.nextLine();
+            }
         }
-        else if (option.equals("2"))
+        System.out.println();
+        while (!option.equalsIgnoreCase("quit"))
         {
-            // Librarians functions
-            while (!option.equalsIgnoreCase("quit"))
-            {
                 //Display options
                 System.out.println("Select your option from the following:");
                 System.out.println("1. Books");
                 System.out.println("2. Members");
-                System.out.println("3. BorrowedBooks");
-                System.out.print("Select your option: ");
+                System.out.println("3. BorrowBooks");
+                System.out.print("Input option here: ");
                 option = scanner.nextLine();
                 System.out.println();
 
                 if (option.equalsIgnoreCase("1"))
                 {
                     // MANAGE BOOKS
-                    libraryObj.manage_books(scanner, BookServiceObject, 0);
+                    libraryObj.manage_books(scanner, BookServiceObject);
                 }
                 else if (option.equalsIgnoreCase("2"))
                 {
@@ -87,15 +73,17 @@ public class LibraryManagementSystem {
                     libraryObj.manage_members(scanner, MemberServiceObject);
 
                 }
+                else if (option.equals("3"))
+                {
+                    // MANAGE BORROWED BOOKS
+                    libraryObj.manage_borrowedBooks(scanner, BookServiceObject);
+                }
 
                 System.out.println();
+                System.out.println("Goodbye.");
 
-            }
         }
-        else
-        {
-            System.out.println("Error: no such option Dummy");
-        }
+
 
         //close necessary operations
         scanner.close();
@@ -104,68 +92,100 @@ public class LibraryManagementSystem {
 
 
 
-    //functions
+    // Methods
 
-    public void borrow_book(Scanner s, BookService bookService)
+    public boolean isLibrarianRegistered(String username, String password)
     {
-        List<Book> shoppingCart = new ArrayList<Book>(); // List of all the books the user needs to borrow;
-
-        System.out.println("View the details of a book by entering its ID ");
-        System.out.print("Enter book ID: ");
-        int bookID = s.nextInt();
-        s.nextLine();
-        System.out.println();
-
-        Book book = bookService.getBook(bookID);
-        boolean continueSearch = true;
-        while (continueSearch){
-
-            if  (book.get_copiesAvailable() > 0)
-            {
-                System.out.println("Book Title: "+ book.get_title());
-                System.out.println("Author: "+ book.get_author());
-                System.out.println("Genre:  "+ book.get_genre());
-
-                System.out.print("Add to shopping cart? (yes/no): ");
-                
-                if (s.nextLine().equals("yes"))
-                {
-                    shoppingCart.add(book);
-                }
-                System.out.println();
-            }
-            else{
-                System.out.println("Sorry there are no more copies of the book. ");
-            }
-
-            System.out.print("Search for more books (yes/no): ");
-            
-            if (!s.nextLine().equals("yes"))
-            {
-                System.out.println();
-                continueSearch = false;
-                System.out.println("Checkout is being processed ...");
-                System.out.println("You have be borrowed the following books");
-
-                for (int i=0; i< shoppingCart.size(); i++)
-                {
-                    System.out.println("Book Title: "+ shoppingCart.get(i).get_title());
-                    System.out.println("Author: "+ shoppingCart.get(i).get_author());
-                    System.out.println("Genre:  "+ shoppingCart.get(i).get_genre());
-                }
-            }
-            else
-            {
-                System.out.print("Enter book ID: ");
-                bookID = s.nextInt();
-                s.nextLine();
-                System.out.println();
-                book = bookService.getBook(bookID);
-            }
+        LibrarianService service = new LibrarianService();
+        Librarian info = service.getLibrarian(username, password);
+        
+        if (info == null)
+        {   
+            return false;
         }
 
+        return true;
+    }
+    public void borrowBook(Scanner s, BookService bookService)
+    {
+        System.out.print("Input member's ID: ");
+        int memberID = s.nextInt();
+        s.nextLine();
 
-        System.out.println("Thank you for borrowing a book.");
+        System.out.print("Input borrowed book ID: ");
+        int bookID = s.nextInt();
+        s.nextLine();
+
+        System.out.print("Input issue date(yyyy-MM-dd): ");
+        Date IssueDate = Date.valueOf(s.nextLine());
+
+        System.out.print("Input return date(yyyy-MM-dd)");
+        Date returnDate = Date.valueOf(s.nextLine());
+
+        // Process the transaction/ Add to borrowed database
+        BorrowedBookService serviceObj = new BorrowedBookService();
+
+        //step 1: check book availability then update
+        Book book = bookService.getBook(bookID);
+
+        if (book.get_copiesAvailable() > 0){
+            book.set_copiesAvailable(book.get_copiesAvailable()-1);
+            bookService.updateBook(book);
+
+            serviceObj.borrowBook(bookID, memberID, IssueDate, returnDate);
+        }
+        else
+        {
+            System.out.println("There are no copies available for the book "+ book.get_title());
+        }
+
+    }
+    public void manage_borrowedBooks(Scanner s, BookService bookService)
+    {
+        System.out.println("Select option");
+        System.out.println("1.  Borrow a book");
+        System.out.println("2.  Return a book");
+        System.out.print("Input option: ");
+        String option = s.nextLine();
+        System.out.println();
+
+        if(option.equals("1"))
+        {
+            // BORROW A BOOK
+            while(!option.equals("no"))
+            {   
+                borrowBook(s, bookService);
+                System.out.print("Would you like to borrow another book? (yes/no): ");
+                option = s.nextLine();
+                System.out.println();
+            }
+            
+        }
+        else if (option.equals("2"))
+        {
+            // RETURN A BOOK
+
+            while(!option.equals("no"))
+            {
+                System.out.print("Input member's ID: ");
+                int memberID = s.nextInt();
+                s.nextLine();
+
+                System.out.print("Input borrowed book ID: ");
+                int bookID = s.nextInt();
+                s.nextLine();
+
+                Book book = bookService.getBook(bookID);
+                book.set_copiesAvailable(book.get_copiesAvailable()+1);
+                bookService.updateBook(book);
+                
+                System.out.println("Thank you for returning the book.");
+                System.out.print("Would you like to return another book? (yes/no): ");
+                option = s.nextLine();
+
+                System.out.println();
+            }
+        }
 
     }
     public void manage_members(Scanner s, MemberService serviceObj)
@@ -174,7 +194,7 @@ public class LibraryManagementSystem {
         System.out.println("1. Add a New Member");
         System.out.println("2. Verify a Member");
         System.out.println("3. Delete a Member");
-        System.out.print("Select your option: ");
+        System.out.print("Input option here: ");
 
         String option = s.nextLine();
         System.out.println();
@@ -246,21 +266,16 @@ public class LibraryManagementSystem {
         }
 
     }
-    public void manage_books(Scanner s, BookService serviceObj, int is_member)
+    public void manage_books(Scanner s, BookService serviceObj)
     {
         System.out.println("Please select an option from the following choices to manage our collection of books.");
-
-        int x = is_member;  // x is zero if method is invoked by administrator else it is 1 if invoked by member
-        if (x == 0)
-        {
-            System.out.println("1. Add a New Book");
-            System.out.println("2. Update Existing Book");
-            System.out.println("3. Delete a Book");
-        }
+        System.out.println("1. Add a New Book");
+        System.out.println("2. Update Existing Book");
+        System.out.println("3. Delete a Book");
         System.out.println("4. Search for a Book");
         System.out.println("5. Display All Available Books");
 
-        System.out.print("Select your option: ");
+        System.out.print("Input option here: ");
         String option = s.nextLine();
         System.out.println();
 
@@ -268,18 +283,18 @@ public class LibraryManagementSystem {
         {
             // ADD A NEW BOOK
             System.out.println();
-            System.out.println("Please input the book details in the following format: Book ID, Title, Author, Genre, Published date(yyyy-MM-dd), ISBN, Copies Available");
+            System.out.println("Please input the book details in the following format: Title, Author, Genre, Published date(yyyy-MM-dd), ISBN, Copies Available");
             
             String book_details = s.nextLine();
             String[] values = book_details.split(",");
 
             //record the data
-            int book_id = Integer.parseInt(values[0]);
-            String title = values[1];
-            String author = values[2];
-            String genre = values[3];
+            
+            String title = values[0];
+            String author = values[1];
+            String genre = values[2];
 
-            String string_date = values[4];
+            String string_date = values[3];
             java.sql.Date sqlDate = null;
 
             //convert the string to sql date
@@ -294,10 +309,10 @@ public class LibraryManagementSystem {
             }
 
             java.sql.Date publishedDate = sqlDate;
-            String isbn = values[5];
-            int copiesAvailable = Integer.parseInt(values[6].trim());
+            String isbn = values[4];
+            int copiesAvailable = Integer.parseInt(values[5].trim());
 
-            serviceObj.addBook(new Book(book_id, title, author, genre, publishedDate, isbn, copiesAvailable));
+            serviceObj.addBook(new Book(title, author, genre, publishedDate, isbn, copiesAvailable));
 
         }
 

@@ -21,6 +21,15 @@ public class BorrowedBook {
         this.fine = fine;
     }
 
+    public BorrowedBook(int bookId, int memberId, Date issueDate, Date returnDate, BigDecimal fine)
+    {
+        this.bookId = bookId;
+        this.memberId = memberId;
+        this.issueDate = issueDate;
+        this.returnDate = returnDate;
+        this.fine = fine;
+    }
+
     // Getters and Setters
 
     public int get_transactionId() { return transactionId;}

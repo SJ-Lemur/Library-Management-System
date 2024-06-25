@@ -11,10 +11,19 @@ public class Book {
     private int copiesAvailable;
 
     // constructor
-
-    public Book(int id, String title, String author, String genre, Date date, String isbn, int copiesAvailable)
+    public Book(int ID, String title, String author, String genre, Date date, String isbn, int copiesAvailable)
     {
-        bookId = id;
+        bookId = ID;
+        this.title = title;
+        this.author = author;
+        this.genre = genre;
+        publishedDate = date;
+        this.isbn = isbn;
+        this.copiesAvailable = copiesAvailable;
+    }
+
+    public Book(String title, String author, String genre, Date date, String isbn, int copiesAvailable)
+    {
         this.title = title;
         this.author = author;
         this.genre = genre;
